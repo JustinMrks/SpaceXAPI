@@ -1,23 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import MissionForm from './Components/MissionForm';
+import MissionsList from './Components/MissionsList';
+import axios from 'axios';
 
 function App() {
+  const [error, setError] = useState('');
+  const [isFetchingData, setIsFetchingData] = useState(false);
+  const [missionsList, setMissionsList] = useState([]);
+  const getMissions = () => {
+    setIsFetchingData(true);
+    axios
+      .get('https://api.spacexdata.com/v3/missions')
+      .then((res) => {
+        setMissionsList(res.data);
+        setIsFetchingData(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setIsFetchingData(false);
+      });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Space X Missions</h1>
+      <MissionForm getData={getMissions} fetching={isFetchingData} />
+      <MissionsList missions={missionsList} error={error} />
     </div>
   );
 }
